@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { Button } from 'react-native-paper';
+import { Button, Headline, Card } from 'react-native-paper';
 
 // ScrollView가 끝에 근접했는지 확인하는 Method
 const isCloseToBottom = ({layoutMeasurement, contentOffset, contentSize}) => {
@@ -33,9 +33,9 @@ export default class TermsAndConditions extends Component
         <View style={styles.container}>
             <View style={styles.container}>
                 <View style={styles.container_button}>
-                    <Text style={styles.title}>이용 약관</Text>
+                    <Headline style={styles.title}>이용 약관</Headline>
                 </View>
-                <View style={styles.container_scrollview}>
+                <Card style={this.state.scrolled ? styles.container_scrollview_scrolled : styles.container_scrollview}>
                 <ScrollView onScroll={({nativeEvent}) => {
                     if (isCloseToBottom(nativeEvent)) {
                         this.setState({scrolled: true})
@@ -72,7 +72,7 @@ export default class TermsAndConditions extends Component
                     <Text>quick brown fox jumps over the lazy dog quick brown fox jumps over the lazy dog quick brown fox jumps over the lazy dog</Text>
                     <Text>quick brown fox jumps over the lazy dog quick brown fox jumps over the lazy dog quick brown fox jumps over the lazy dog</Text>
                 </ScrollView>
-                </View>
+                </Card>
                 </View>
             <View style={styles.container_button}>
             <Button mode='contained' disabled={ !this.state.scrolled } onPress={ ()=>this.moveToReport() } 
@@ -113,8 +113,19 @@ const styles = StyleSheet.create({
     borderTopWidth:2
   },
 
+  container_scrollview_scrolled:{
+    marginTop: 20,
+    flex: 15,
+    padding: 5,
+    borderColor: '#EF7777',
+    borderBottomWidth:2,
+    borderLeftWidth:2,
+    borderRightWidth:2,
+    borderTopWidth:2
+  },
+
   title: {
-      fontSize: 22,
+      fontSize: 24,
       alignSelf: 'center',
   },
 
