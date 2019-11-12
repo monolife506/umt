@@ -52,9 +52,7 @@ export default class SearchTab extends Component {
       />
     );
   };
-  componentDidMount() {
-    stealFoodType();
-  }
+
   // '검색' 탭에 표시되는 내용
   render() {
     return (
