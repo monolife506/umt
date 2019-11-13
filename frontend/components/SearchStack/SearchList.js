@@ -46,12 +46,15 @@ export default class SearchTab extends Component {
       <List.Item
         title={item.phonenumber}
         description={item.company}
-        onPress={() => {this.props.navigation.navigate('Detail', {item});}}
+        onPress={() => {
+          this.props.navigation.navigate("Detail", { item });
+        }}
         // TODO : 신용에 따라 맞춤 아이콘으로 적용하기
         left={props => <List.Icon color={item.color} icon="account" />}
       />
     );
   };
+
 
   // '검색' 탭에 표시되는 내용
   render() {
