@@ -3,18 +3,16 @@
 
 import React, { Component } from "react";
 import { View, Text, StyleSheet, FlatList, TextInput } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
-import { List } from "react-native-paper";
+import { List, Searchbar } from "react-native-paper";
 import _ from "lodash";
-import { SearchBar } from "react-native-elements";
 
 // Test용 데이터 함수 : 나중에 지울것
-import { getData, stealFoodType } from "../tmp/fakedata";
+import { getData } from "../tmp/fakedata";
 
 export default class SearchTab extends Component {
   // 네비게이터 옵션
   static navigationOptions = {
-    header: null
+    header: null,
   };
   constructor(props) {
     super(props);
@@ -24,7 +22,7 @@ export default class SearchTab extends Component {
   }
   // Flatlist 관련 state
   state = {
-    refreshing: false
+    refreshing: false,
 
     // TODO: backend 구현 내용에 맞게 받을 데이터 수정
   };
@@ -34,7 +32,7 @@ export default class SearchTab extends Component {
   // TODO : 오랫동안 리스트를 밀었을 때 최적화
   onEndReached = () => {
     this.setState(state => ({
-      data: [...state.data, ...getData()]
+      data: [...state.data, ...getData()],
     }));
   };
 
@@ -42,9 +40,7 @@ export default class SearchTab extends Component {
     //passing the inserted text in textinput
     const newData = this.arrayholder.filter(function(item) {
       //applying filter for the inserted text in search bar
-      const itemData = item.phonenumber
-        ? item.phonenumber.toUpperCase()
-        : "".toUpperCase();
+      const itemData = item.phonenumber ? item.phonenumber.toUpperCase() : "".toUpperCase();
       const textData = text.toUpperCase();
       return itemData.indexOf(textData) > -1;
     });
@@ -52,7 +48,7 @@ export default class SearchTab extends Component {
       //setting the filtered newData on datasource
       //After setting the data it will automatically re-render the view
       data: newData,
-      text: text
+      text: text,
     });
   }
 
@@ -95,12 +91,11 @@ export default class SearchTab extends Component {
   render() {
     return (
       <View>
-        <TextInput
+        <Searchbar
           style={styles.textInputStyle}
           onChangeText={text => this.SearchFilterFunction(text)}
           value={this.state.text}
-          underlineColorAndroid="transparent"
-          placeholder="Search Here"
+          placeholder="010-####-####"
         />
         <View style={styles.container}>
           <FlatList
@@ -119,20 +114,24 @@ export default class SearchTab extends Component {
 }
 
 const styles = StyleSheet.create({
+  topIcon: {
+    paddingLeft: 10,
+  },
+  iconContainer: {
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    width: 120,
+  },
   viewStyle: {
     justifyContent: "center",
     flex: 1,
     marginTop: 40,
-    padding: 16
+    padding: 16,
   },
   textStyle: {
-    padding: 10
+    padding: 10,
   },
   textInputStyle: {
-    height: 40,
-    borderWidth: 1,
-    paddingLeft: 10,
-    borderColor: "#EF7777",
-    backgroundColor: "#faeded"
-  }
+    padding: 10,
+  },
 });
