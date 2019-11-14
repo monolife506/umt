@@ -19,17 +19,17 @@ import {
   Provider,
   RadioButton
 } from "react-native-paper";
+import axios from 'axios';
 
 export default class ReportTab extends Component {
   // 네비게이터 옵션
   static navigationOptions = {
     header: null
   };
-
   // States
   state = {
     input_phoneNumber: "",
-    input_company: "바로고 (BAROGO)",
+    input_company: "",
     input_food: "한식",
     input_date: new Date(Date.now()),
     input_date_text: "훔친 날짜를 입력해 주세요",
@@ -74,9 +74,25 @@ export default class ReportTab extends Component {
       </View>
     );
   };
-
+  refactoring_date = () => {
+    let arr = this.state.input_date_text.split('/');
+    let res = "";
+    res += arr[2] + '-';
+    res += arr[0] + '-';
+    res += arr[1];
+    return res;
+  };
   // 신고
-  report = () => {};
+  report = () => {
+      axios.get('http://192.168.2.184:3000/api/report', {
+          params: {
+              phoneNumber: this.state.input_phoneNumber,
+              affiliation: this.state.input_company,
+              food: this.state.input_food,
+              occuredTime: "20" + this.refactoring_date(this.state.input_date_text)
+          }
+      }).catch(err => {console.log(err)});
+  };
 
   // 창 숨기기
   _hideDialog = () =>
@@ -213,31 +229,31 @@ export default class ReportTab extends Component {
                   >
                     <View style={styles.dialogContainer}>
                       <Text style={styles.dialogText}>바로고 (BAROGO)</Text>
-                      <RadioButton value="바로고 (BAROGO)" color="#EF7777" />
+                      <RadioButton value="1" color="#EF7777" />
                     </View>
                     <View style={styles.dialogContainer}>
                       <Text style={styles.dialogText}>배달요 (BAEDALYO)</Text>
-                      <RadioButton value="배달요 (BAEDALYO)" color="#EF7777" />
+                      <RadioButton value="2" color="#EF7777" />
                     </View>
                     <View style={styles.dialogContainer}>
                       <Text style={styles.dialogText}>리드콜 (LEADCALL)</Text>
-                      <RadioButton value="리드콜 (LEADCALL)" color="#EF7777" />
+                      <RadioButton value="3" color="#EF7777" />
                     </View>
                     <View style={styles.dialogContainer}>
                       <Text style={styles.dialogText}>모아콜 (MOACALL)</Text>
-                      <RadioButton value="모아콜 (MOACALL)" color="#EF7777" />
+                      <RadioButton value="4" color="#EF7777" />
                     </View>
                     <View style={styles.dialogContainer}>
                       <Text style={styles.dialogText}>부릉 (VROONG)</Text>
-                      <RadioButton value="부릉 (VROONG)" color="#EF7777" />
+                      <RadioButton value="5" color="#EF7777" />
                     </View>
                     <View style={styles.dialogContainer}>
                       <Text style={styles.dialogText}>배민라이더스</Text>
-                      <RadioButton value="배민라이더스" color="#EF7777" />
+                      <RadioButton value="6" color="#EF7777" />
                     </View>
                     <View style={styles.dialogContainer}>
                       <Text style={styles.dialogText}>기타</Text>
-                      <RadioButton value="기타" color="#EF7777" />
+                      <RadioButton value="7" color="#EF7777" />
                     </View>
                   </RadioButton.Group>
                 </ScrollView>
