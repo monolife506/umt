@@ -19,6 +19,7 @@ import {
   Provider,
   RadioButton,
 } from "react-native-paper";
+import axios from 'axios';
 
 export default class ReportTab extends Component {
   // 네비게이터 옵션
@@ -69,7 +70,25 @@ export default class ReportTab extends Component {
   // 신고
   // 일단은 보류
   // TODO: 전송 결과에 따라 Snackbar 표시
-  report = () => {};
+    refactoring_date = () => {
+        let arr = this.state.input_date_text.split('/');
+        let res = "";
+        res += arr[2] + '-';
+        res += arr[0] + '-';
+        res += arr[1];
+        return res;
+    };
+    // 신고
+    report = () => {
+        axios.get('http://192.168.2.184:3000/api/report', {
+            params: {
+                phoneNumber: this.state.input_phoneNumber,
+                affiliation: this.state.input_company,
+                food: this.state.input_food,
+                occuredTime: "20" + this.refactoring_date(this.state.input_date_text)
+            }
+        }).catch(err => {console.log(err)});
+    };
 
   // 창 숨기기
   _hideDialog = () =>
