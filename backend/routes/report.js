@@ -29,6 +29,7 @@ router.get('/', async (req, res, next) => {
         'INSERT INTO deliveryList(deliveryManId, shopId, food, occuredTime, isCrime) VALUES (?, ?, ?, ?, ?)',
         [deliveryManInfo[0].deliveryManId, 2, food, occuredTime, 1]
     );
+    res.send(deliveryInfo);
 });
 
 module.exports = router;
