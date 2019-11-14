@@ -7,7 +7,7 @@ import {
   StyleSheet,
   ScrollView,
   KeyboardAvoidingView,
-  DatePickerAndroid
+  DatePickerAndroid,
 } from "react-native";
 import {
   Card,
@@ -17,14 +17,15 @@ import {
   Dialog,
   Portal,
   Provider,
-  RadioButton
+  RadioButton,
+  Snackbar,
 } from "react-native-paper";
 import axios from "axios";
 
 export default class ReportTab extends Component {
   // 네비게이터 옵션
   static navigationOptions = {
-    header: null
+    header: null,
   };
   // States
   state = {
@@ -37,7 +38,9 @@ export default class ReportTab extends Component {
 
     date_info: {},
     visible_companydialog: false,
-    visible_fooddialog: false
+    visible_fooddialog: false,
+    visible_snackbar_done: false,
+    visible_snackbar_error: false,
   };
 
   // 회사 고르는 창 표시
@@ -49,9 +52,7 @@ export default class ReportTab extends Component {
   // 안드로이드
   _showDatePicker_android = async options => {
     try {
-      const { action, year, month, day } = await DatePickerAndroid.open(
-        options
-      );
+      const { action, year, month, day } = await DatePickerAndroid.open(options);
       if (action !== DatePickerAndroid.dismissedAction) {
         let date = new Date(year, month, day);
         let date_info = {};
@@ -64,12 +65,11 @@ export default class ReportTab extends Component {
     }
   };
   // 아이폰
-  _showDialog_Datepicker_ios = () =>
-    this.setState({ visible_datedialog_ios: true });
+  _showDialog_Datepicker_ios = () => this.setState({ visible_datedialog_ios: true });
   _setDate_ios = newDate =>
     this.setState({
       input_date: newDate,
-      input_date_text: newDate.toLocaleDateString("ko-KR")
+      input_date_text: newDate.toLocaleDateString("ko-KR"),
     });
   refactoring_date_android = () => {
     let arr = this.state.input_date_text.split("/");
@@ -106,11 +106,13 @@ export default class ReportTab extends Component {
           phoneNumber: this.state.input_phoneNumber,
           affiliation: this.state.input_company,
           food: this.state.input_food,
-          occuredTime: this._distinguish_flatForm()
-        }
+          occuredTime: this._distinguish_flatForm(),
+        },
       })
+      .then(() => this.setState({ visible_snackbar_done: true }))
       .catch(err => {
         console.log(err);
+        this.setState({ visible_snackbar_error: true });
       });
   };
 
@@ -119,7 +121,7 @@ export default class ReportTab extends Component {
     this.setState({
       visible_companydialog: false,
       visible_fooddialog: false,
-      visible_datedialog_ios: false
+      visible_datedialog_ios: false,
     });
   // '신고' 탭에 표시되는 내용
 
@@ -135,11 +137,7 @@ export default class ReportTab extends Component {
 
     return (
       <Provider>
-        <KeyboardAvoidingView
-          style={styles.wrapper}
-          behavior="padding"
-          keyboardVerticalOffset={80}
-        >
+        <KeyboardAvoidingView style={styles.wrapper} behavior="padding" keyboardVerticalOffset={80}>
           <Card style={styles.container}>
             <View style={styles.inputContainerStyle}>
               <TextInput
@@ -149,14 +147,9 @@ export default class ReportTab extends Component {
                 selectionColor="#EF7777"
                 underlineColorAndroid="#EF7777"
                 value={this.state.input_phoneNumber}
-                onChangeText={input =>
-                  this.setState({ input_phoneNumber: input })
-                }
+                onChangeText={input => this.setState({ input_phoneNumber: input })}
               />
-              <HelperText
-                type=""
-                visible={!this.state.input_phoneNumber.isValidPhoneNumber()}
-              >
+              <HelperText type="" visible={!this.state.input_phoneNumber.isValidPhoneNumber()}>
                 010-####-####의 형식으로 입력해 주세요.
               </HelperText>
             </View>
@@ -213,7 +206,7 @@ export default class ReportTab extends Component {
                   Platform.OS === "android"
                     ? () =>
                         this._showDatePicker_android({
-                          date: this.state.input_date
+                          date: this.state.input_date,
                         })
                     : () => this._showDialog_Datepicker_ios()
                 }
@@ -243,16 +236,11 @@ export default class ReportTab extends Component {
           </Card>
 
           <Portal>
-            <Dialog
-              visible={this.state.visible_companydialog}
-              onDismiss={this._hideDialog}
-            >
+            <Dialog visible={this.state.visible_companydialog} onDismiss={this._hideDialog}>
               <Dialog.ScrollArea>
                 <ScrollView contentContainerStyle={styles.dialogBox}>
                   <RadioButton.Group
-                    onValueChange={value =>
-                      this.setState({ input_company: value })
-                    }
+                    onValueChange={value => this.setState({ input_company: value })}
                     value={this.state.input_company}
                   >
                     <View style={styles.dialogContainer}>
@@ -292,16 +280,11 @@ export default class ReportTab extends Component {
                 </Button>
               </Dialog.Actions>
             </Dialog>
-            <Dialog
-              visible={this.state.visible_fooddialog}
-              onDismiss={this._hideDialog}
-            >
+            <Dialog visible={this.state.visible_fooddialog} onDismiss={this._hideDialog}>
               <Dialog.ScrollArea>
                 <ScrollView contentContainerStyle={styles.dialogBox}>
                   <RadioButton.Group
-                    onValueChange={value =>
-                      this.setState({ input_food: value })
-                    }
+                    onValueChange={value => this.setState({ input_food: value })}
                     value={this.state.input_food}
                   >
                     <View style={styles.dialogContainer}>
@@ -329,9 +312,7 @@ export default class ReportTab extends Component {
                       <RadioButton value="피자" color="#EF7777" />
                     </View>
                     <View style={styles.dialogContainer}>
-                      <Text style={styles.dialogText}>
-                        아시안 (쌀국수 등 동남아시아 요리)
-                      </Text>
+                      <Text style={styles.dialogText}>아시안 (쌀국수 등 동남아시아 요리)</Text>
                       <RadioButton value="아시안" color="#EF7777" />
                     </View>
                     <View style={styles.dialogContainer}>
@@ -347,9 +328,7 @@ export default class ReportTab extends Component {
                       <RadioButton value="족발/보쌈" color="#EF7777" />
                     </View>
                     <View style={styles.dialogContainer}>
-                      <Text style={styles.dialogText}>
-                        야식 (닭발, 오돌뼈, 곱창)
-                      </Text>
+                      <Text style={styles.dialogText}>야식 (닭발, 오돌뼈, 곱창)</Text>
                       <RadioButton value="야식" color="#EF7777" />
                     </View>
                     <View style={styles.dialogContainer}>
@@ -401,6 +380,19 @@ export default class ReportTab extends Component {
               </Dialog.Actions>
             </Dialog>
           </Portal>
+
+          <Snackbar
+            visible={this.state.visible_snackbar_done}
+            onDismiss={() => this.setState({ visible_snackbar_done: false })}
+          >
+            신고가 접수되었습니다.
+          </Snackbar>
+          <Snackbar
+            visible={this.state.visible_snackbar_error}
+            onDismiss={() => this.setState({ visible_snackbar_error: false })}
+          >
+            전송 중에 오류가 발생했습니다.
+          </Snackbar>
         </KeyboardAvoidingView>
       </Provider>
     );
@@ -409,52 +401,52 @@ export default class ReportTab extends Component {
 
 const styles = StyleSheet.create({
   wrapper: {
-    flex: 1
+    flex: 1,
   },
 
   container: {
     flex: 1,
     padding: 8,
-    margin: 10
+    margin: 10,
   },
 
   inputContainerStyle: {
-    margin: 8
+    margin: 8,
   },
 
   infoContainerStyle: {
     margin: 8,
-    flexBasis: "75%"
+    flexBasis: "75%",
   },
 
   infoButtonStyle: {
     margin: 8,
     flexBasis: "15%",
-    justifyContent: "center"
+    justifyContent: "center",
   },
 
   inputContainerStyle_inside: {
     flexDirection: "row",
-    margin: 8
+    margin: 8,
   },
 
   inputContainerStyle_inside_button: {
     flexDirection: "row-reverse",
-    margin: 8
+    margin: 8,
   },
 
   ButtonText: {
-    color: "#EF7777"
+    color: "#EF7777",
   },
 
   ButtonText_Datepicker_ios: {
     color: "#EF7777",
-    fontSize: 25
+    fontSize: 25,
   },
 
   dialogBox: {
     paddingHorizontal: 2,
-    paddingVertical: 10
+    paddingVertical: 10,
   },
 
   dialogContainer: {
@@ -462,29 +454,29 @@ const styles = StyleSheet.create({
     margin: 5,
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center"
+    alignItems: "center",
   },
 
   dateDialogContainer: {
     flex: 1,
-    justifyContent: "center"
+    justifyContent: "center",
   },
 
   dialogText: {
-    fontSize: 15
+    fontSize: 15,
   },
 
   button: {
-    backgroundColor: "#EF7777"
+    backgroundColor: "#EF7777",
   },
 
   buttonDisabled: {
-    backgroundColor: "#999"
+    backgroundColor: "#999",
   },
 
   buttonLabel: {
     fontSize: 14,
     color: "#FFF",
-    alignSelf: "center"
-  }
+    alignSelf: "center",
+  },
 });
