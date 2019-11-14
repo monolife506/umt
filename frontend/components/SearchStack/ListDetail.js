@@ -118,7 +118,7 @@ export default class Detail extends Component {
         <View style={styles.history}>
           <FlatList
             data={this.state.data}
-            keyExtractor={(item, key) => item.key}
+            keyExtractor={(item, key) => this.state.data.indexOf(item).toString()}
             renderItem={this.onRenderItem}
             ItemSeparatorComponent={this.FlatListItemSeparator}
           ></FlatList>
