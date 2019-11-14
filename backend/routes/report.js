@@ -10,6 +10,8 @@ router.get('/', async (req, res, next) => {
     let food = req.query.food;
     let occuredTime = req.query.occuredTime;
 
+    if(occuredTime) occuredTime += " 00:00:00";
+
     let deliveryManInfo = await connection.query(
         'SELECT * FROM `deliveryManList` WHERE phoneNumber = ?',
         [phoneNumber]
@@ -29,6 +31,7 @@ router.get('/', async (req, res, next) => {
         'INSERT INTO deliveryList(deliveryManId, shopId, food, occuredTime, isCrime) VALUES (?, ?, ?, ?, ?)',
         [deliveryManInfo[0].deliveryManId, 2, food, occuredTime, 1]
     );
+    console.log(deliveryInfo);
     res.send(deliveryInfo);
 });
 
