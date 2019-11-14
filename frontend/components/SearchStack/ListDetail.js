@@ -10,9 +10,11 @@ import {
   SafeAreaView,
   TouchableOpacity,
   Linking,
-  Platform
+  Platform,
+  ImageBackground
 } from "react-native";
 import { List } from "react-native-paper";
+
 import { Ionicons } from "@expo/vector-icons";
 import { createAppContainer, navigation } from "react-navigation";
 import { createStackNavigator } from "react-navigation-stack";
@@ -91,13 +93,26 @@ export default class Detail extends Component {
         color: "white",
         fontSize: 30,
         fontWeight: "700"
+      },
+      ImageBackgroundStyle: {
+        flex: 1,
+        alignContent: "center",
+        alignItems: "center"
+      },
+      IoniconsStyle: {
+        alignContent: "center",
+        alignItems: "center"
       }
     });
 
     return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.overview}>
+        <ImageBackground
+          style={styles.ImageBackgroundStyle}
+          source={require("../../image.jpg")}
+        >
           <Ionicons
+            style={styles.IoniconsStyle}
             name="ios-happy"
             size={100}
             color={mystuff.color}
@@ -109,10 +124,11 @@ export default class Detail extends Component {
             }}
           >
             <Text style={styles.TextStyle}>
-              companyNumber:{mystuff.companyPhoneNumber}
+              companyNumber:{"\n"}
+              {mystuff.companyPhoneNumber}
             </Text>
           </TouchableOpacity>
-        </View>
+        </ImageBackground>
         <View style={styles.history}>
           <FlatList
             data={this.state.data}
