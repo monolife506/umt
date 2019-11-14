@@ -2,9 +2,11 @@
 // 앱 메인 화면에서의 '검색' 탭
 
 import React, { Component } from "react";
-import { View, Text, StyleSheet, FlatList } from "react-native";
+import { View, Text, StyleSheet, FlatList, TextInput } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { List } from "react-native-paper";
+import _ from "lodash";
+import { SearchBar } from "react-native-elements";
 
 // Test용 데이터 함수 : 나중에 지울것
 import { getData, stealFoodType } from "../tmp/fakedata";
@@ -14,11 +16,16 @@ export default class SearchTab extends Component {
   static navigationOptions = {
     header: null
   };
-
+  constructor(props) {
+    super(props);
+    //setting default state
+    this.state = { data: getData(20), text: "" };
+    this.arrayholder = this.state.data;
+  }
   // Flatlist 관련 state
   state = {
-    refreshing: false,
-    data: getData(20)
+    refreshing: false
+
     // TODO: backend 구현 내용에 맞게 받을 데이터 수정
   };
 
@@ -30,6 +37,35 @@ export default class SearchTab extends Component {
       data: [...state.data, ...getData()]
     }));
   };
+
+  SearchFilterFunction(text) {
+    //passing the inserted text in textinput
+    const newData = this.arrayholder.filter(function(item) {
+      //applying filter for the inserted text in search bar
+      const itemData = item.phonenumber
+        ? item.phonenumber.toUpperCase()
+        : "".toUpperCase();
+      const textData = text.toUpperCase();
+      return itemData.indexOf(textData) > -1;
+    });
+    this.setState({
+      //setting the filtered newData on datasource
+      //After setting the data it will automatically re-render the view
+      data: newData,
+      text: text
+    });
+  }
+
+  // renderHeader() {
+  //   return (
+  //     <SearchBar
+  //       placeholder="Type Here..."
+  //       lightTheme
+  //       round
+  //       onChangeText={this.handleSearch}
+  //     />
+  //   );
+  // }
 
   // 리스트 항목을 누르면 호출되는 Method
   // Detail 창으로 이동, item 정보 전달
@@ -55,19 +91,48 @@ export default class SearchTab extends Component {
     );
   };
 
-
   // '검색' 탭에 표시되는 내용
   render() {
     return (
-      <FlatList
-        data={this.state.data}
-        renderItem={this.onRenderItem}
-        keyExtractor={(item, key) => item.key}
-        onEndReached={this.onEndReached}
-        onEndReachedThreshold={1}
-        refreshing={this.state.refreshing}
-        onRefresh={this.onRefresh}
-      ></FlatList>
+      <View>
+        <TextInput
+          style={styles.textInputStyle}
+          onChangeText={text => this.SearchFilterFunction(text)}
+          value={this.state.text}
+          underlineColorAndroid="transparent"
+          placeholder="Search Here"
+        />
+        <View style={styles.container}>
+          <FlatList
+            data={this.state.data}
+            renderItem={this.onRenderItem}
+            keyExtractor={(item, key) => item.key}
+            onEndReached={this.onEndReached}
+            onEndReachedThreshold={1}
+            refreshing={this.state.refreshing}
+            onRefresh={this.OonRefresh}
+          ></FlatList>
+        </View>
+      </View>
     );
   }
 }
+
+const styles = StyleSheet.create({
+  viewStyle: {
+    justifyContent: "center",
+    flex: 1,
+    marginTop: 40,
+    padding: 16
+  },
+  textStyle: {
+    padding: 10
+  },
+  textInputStyle: {
+    height: 40,
+    borderWidth: 1,
+    paddingLeft: 10,
+    borderColor: "#EF7777",
+    backgroundColor: "#faeded"
+  }
+});
