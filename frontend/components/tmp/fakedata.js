@@ -44,7 +44,7 @@ export const getData = (count = 10) => {
     const _company = company.companyName();
     const _companyPhoneNumber = phone.phoneNumber("032-####-####");
     const FoodHistory = [];
-
+    const count = 0;
     // 신용도 : 1 == 안전, 2 == 주의, 3 == 위험
     const credit = random.number({ min: 0, max: 2 });
     const color = colors[credit];
@@ -56,12 +56,21 @@ export const getData = (count = 10) => {
       const randomNumber2 = random.number({ min: 0, max: 5 });
       const _randomStealType = foodArr[randomNumber1];
       const _randomStealDate = stealDate[randomNumber2];
-
+      count += 1;
       FoodHistory.push({
         randomStealType: _randomStealType,
         randomStealDate: _randomStealDate
       });
     }
+
+    if (count >= 5) {
+      color = colors[0];
+    } else if (count >= 3) {
+      color = colors[1];
+    } else {
+      color = colors[2];
+    }
+
     arr.push({
       key,
       phonenumber,
