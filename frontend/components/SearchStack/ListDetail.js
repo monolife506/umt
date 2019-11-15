@@ -125,10 +125,8 @@ export default class Detail extends Component {
             }}
           >
             <Text style={styles.TextStyle}>
-              companyNumber:{"\n"}
-              {mystuff.companyPhoneNumber.slice(0, 4) +
-                "-" +
-                mystuff.companyPhoneNumber.slice(4, 8)}
+              업체 전화번호:{"\n"}
+              {mystuff.companyPhoneNumber}
             </Text>
           </TouchableOpacity>
         </ImageBackground>
