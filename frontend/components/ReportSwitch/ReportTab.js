@@ -30,7 +30,7 @@ export default class ReportTab extends Component {
   // States
   state = {
     input_phoneNumber: "",
-    input_company: "",
+    input_company: "바로고",
     input_food: "한식",
     input_date: new Date(Date.now()),
     input_date_text: "훔친 날짜를 입력해 주세요",
@@ -98,13 +98,20 @@ export default class ReportTab extends Component {
     }
   };
 
+  // 신고할 때 회사 이름을 바꿀 때 사용되는 array
+  refactoring_affiliation = value => {
+    const arr = [0, "바로고", "배달요", "리드콜", "모아콜", "부릉", "배민라이더스", "기타"];
+    console.log(arr.indexOf(value));
+    return arr.indexOf(value);
+  };
+
   // 신고
   report = () => {
     axios
       .get("http://192.168.2.184:3000/api/report", {
         params: {
           phoneNumber: this.state.input_phoneNumber,
-          affiliation: this.state.input_company,
+          affiliation: this.refactoring_affiliation(this.state.input_company),
           food: this.state.input_food,
           occuredTime: this._distinguish_flatForm(),
         },
@@ -132,7 +139,7 @@ export default class ReportTab extends Component {
 
   render() {
     String.prototype.isValidPhoneNumber = function() {
-      return /^010-?([0-9]{3,4})-?([0-9]{4})$/.test(this);
+      return /^010-?([0-9]{8})$/.test(this);
     };
 
     return (
@@ -150,7 +157,7 @@ export default class ReportTab extends Component {
                 onChangeText={input => this.setState({ input_phoneNumber: input })}
               />
               <HelperText type="" visible={!this.state.input_phoneNumber.isValidPhoneNumber()}>
-                010-####-####의 형식으로 입력해 주세요.
+                010########의 형식으로 입력해 주세요.
               </HelperText>
             </View>
             <View style={styles.inputContainerStyle_inside}>
@@ -245,31 +252,31 @@ export default class ReportTab extends Component {
                   >
                     <View style={styles.dialogContainer}>
                       <Text style={styles.dialogText}>바로고 (BAROGO)</Text>
-                      <RadioButton value="1" color="#EF7777" />
+                      <RadioButton value="바로고" color="#EF7777" />
                     </View>
                     <View style={styles.dialogContainer}>
                       <Text style={styles.dialogText}>배달요 (BAEDALYO)</Text>
-                      <RadioButton value="2" color="#EF7777" />
+                      <RadioButton value="배달요" color="#EF7777" />
                     </View>
                     <View style={styles.dialogContainer}>
                       <Text style={styles.dialogText}>리드콜 (LEADCALL)</Text>
-                      <RadioButton value="3" color="#EF7777" />
+                      <RadioButton value="리드콜" color="#EF7777" />
                     </View>
                     <View style={styles.dialogContainer}>
                       <Text style={styles.dialogText}>모아콜 (MOACALL)</Text>
-                      <RadioButton value="4" color="#EF7777" />
+                      <RadioButton value="모아콜" color="#EF7777" />
                     </View>
                     <View style={styles.dialogContainer}>
                       <Text style={styles.dialogText}>부릉 (VROONG)</Text>
-                      <RadioButton value="5" color="#EF7777" />
+                      <RadioButton value="부릉" color="#EF7777" />
                     </View>
                     <View style={styles.dialogContainer}>
                       <Text style={styles.dialogText}>배민라이더스</Text>
-                      <RadioButton value="6" color="#EF7777" />
+                      <RadioButton value="배민라이더스" color="#EF7777" />
                     </View>
                     <View style={styles.dialogContainer}>
                       <Text style={styles.dialogText}>기타</Text>
-                      <RadioButton value="7" color="#EF7777" />
+                      <RadioButton value="기타" color="#EF7777" />
                     </View>
                   </RadioButton.Group>
                 </ScrollView>
