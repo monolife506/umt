@@ -106,7 +106,7 @@ export default class ReportTab extends Component {
   // 신고
   report = () => {
     axios // 입력된 정보 전송
-      .get("http://192.168.2.184:3000/api/report", {
+      .get("http://192.168.0.10:3000/api/report", {
         params: {
           phoneNumber: this.state.input_phoneNumber,
           affiliation: this.refactoring_affiliation(this.state.input_company),
