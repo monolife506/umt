@@ -5,44 +5,46 @@ import React, { Component } from "react";
 import { View, Text, StyleSheet, FlatList, TextInput } from "react-native";
 import { List, Searchbar } from "react-native-paper";
 import _ from "lodash";
+import axios from "axios";
 
-// Test용 데이터 함수 : 나중에 지울것
-import { getData } from "../tmp/fakedata";
+const search = () => {
+  axios
+    .get("http://192.168.2.184:3000/api/search")
+    .then(res => {
+      console.log(res);
+    })
+    .catch(err => {
+      console.log(err);
+    });
+};
 
 export default class SearchTab extends Component {
   // 네비게이터 옵션
   static navigationOptions = {
-    header: null
+    header: null,
   };
   constructor(props) {
     super(props);
     //setting default state
-    this.state = { data: getData(20), text: "" };
+    this.state = { data: search(), text: "", refreshing: false };
     this.arrayholder = this.state.data;
   }
-  // Flatlist 관련 state
-  state = {
-    refreshing: false
-
-    // TODO: backend 구현 내용에 맞게 받을 데이터 수정
-  };
 
   // 리스트에 끝에 도달하면 호출되는 Method
   // 10개의 데이터를 state.data에 추가한다.
   // TODO : 오랫동안 리스트를 밀었을 때 최적화
   onEndReached = () => {
     this.setState(state => ({
-      data: [...state.data, ...getData()]
+      data: [...state.data, ...getData()],
     }));
   };
 
+  componentDidMount() {}
   SearchFilterFunction(text) {
     //passing the inserted text in textinput
     const newData = this.arrayholder.filter(function(item) {
       //applying filter for the inserted text in search bar
-      const itemData = item.phonenumber
-        ? item.phonenumber.toUpperCase()
-        : "".toUpperCase();
+      const itemData = item.phonenumber ? item.phonenumber.toUpperCase() : "".toUpperCase();
       const textData = text.toUpperCase();
       return itemData.indexOf(textData) > -1;
     });
@@ -50,28 +52,17 @@ export default class SearchTab extends Component {
       //setting the filtered newData on datasource
       //After setting the data it will automatically re-render the view
       data: newData,
-      text: text
+      text: text,
     });
   }
-
-  // renderHeader() {
-  //   return (
-  //     <SearchBar
-  //       placeholder="Type Here..."
-  //       lightTheme
-  //       round
-  //       onChangeText={this.handleSearch}
-  //     />
-  //   );
-  // }
 
   // 리스트 항목을 누르면 호출되는 Method
   // Detail 창으로 이동, item 정보 전달
 
   // Pull to Refresh를 시도할 때 호출되는 Method
   // 데이터 20개를 다시 받는다.
-  onRefresh = () => {
-    this.setState({ data: getData(20) });
+  onRefresh_list = () => {
+    this.setState({ data: search() });
   };
 
   // 리스트의 내용을 출력할 때 호출되는 Method
@@ -97,7 +88,7 @@ export default class SearchTab extends Component {
           style={styles.textInputStyle}
           onChangeText={text => this.SearchFilterFunction(text)}
           value={this.state.text}
-          placeholder="010-####-####"
+          placeholder="010########"
         />
         <View style={styles.container}>
           <FlatList
@@ -107,7 +98,7 @@ export default class SearchTab extends Component {
             onEndReached={this.onEndReached}
             onEndReachedThreshold={1}
             refreshing={this.state.refreshing}
-            onRefresh={this.OonRefresh}
+            onRefresh={this.onRefresh_list}
           ></FlatList>
         </View>
       </View>
@@ -117,23 +108,23 @@ export default class SearchTab extends Component {
 
 const styles = StyleSheet.create({
   topIcon: {
-    paddingLeft: 10
+    paddingLeft: 10,
   },
   iconContainer: {
     flexDirection: "row",
     justifyContent: "space-evenly",
-    width: 120
+    width: 120,
   },
   viewStyle: {
     justifyContent: "center",
     flex: 1,
     marginTop: 40,
-    padding: 16
+    padding: 16,
   },
   textStyle: {
-    padding: 10
+    padding: 10,
   },
   textInputStyle: {
-    padding: 10
-  }
+    padding: 10,
+  },
 });
