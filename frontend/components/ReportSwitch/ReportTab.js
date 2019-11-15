@@ -19,58 +19,70 @@ import {
   Provider,
   RadioButton,
   Snackbar,
-} from "react-native-paper";
-import axios from "axios";
+} from "react-native-paper"; // Material design 구현
+import axios from "axios"; // 서버에 데이터 전송
 
 export default class ReportTab extends Component {
   // 네비게이터 옵션
   static navigationOptions = {
-    header: null,
+    header: null, // 이중 헤더 표시 방지
   };
   // States
   state = {
-    input_phoneNumber: "",
-    input_company: "바로고",
-    input_food: "한식",
-    input_date: new Date(Date.now()),
-    input_date_text: "훔친 날짜를 입력해 주세요",
-    input_stealHistory: { food: "", date: "" },
+    input_phoneNumber: "", // 음식을 훔친 배달부의 휴대폰 번호
+    input_company: "바로고", // 배달부의 배달 대행 업체 소속
+    input_food: "한식", // 빼앗긴 음식의 종류
+    input_date: new Date(Date.now()), // 음식을 빼앗긴 날짜
+    input_date_text: "훔친 날짜를 입력해 주세요", // 음식을 빼앗긴 날짜, String 형식 (정보 전달에 사용됨)
 
-    date_info: {},
-    visible_companydialog: false,
-    visible_fooddialog: false,
-    visible_snackbar_done: false,
-    visible_snackbar_error: false,
+    visible_companydialog: false, // 배달 대행 업체를 선택하는 Dialog 표시
+    visible_fooddialog: false, // 빼앗긴 음식의 종류를 선택하는 Dialog 표시
+    visible_snackbar_done: false, // 신고에 성공하면 Snackbar 표시
+    visible_snackbar_error: false, // 신고 도중 오류가 발생한 경우 Snackbar 표시
   };
 
   // 회사 고르는 창 표시
   _showDialog_company = () => this.setState({ visible_companydialog: true });
   // 음식 고르는 창 표시
   _showDialog_food = () => this.setState({ visible_fooddialog: true });
-  // 날짜 고르는 창 표시
 
+  // 날짜 고르는 창 표시
   // 안드로이드
   _showDatePicker_android = async options => {
     try {
+      // 안드로이드에 내장된 Datepicker open
       const { action, year, month, day } = await DatePickerAndroid.open(options);
       if (action !== DatePickerAndroid.dismissedAction) {
+        // Datepicker가 닫히지 않은 경우
         let date = new Date(year, month, day);
         let date_info = {};
         date_info["input_date"] = date;
-        date_info["input_date_text"] = date.toLocaleDateString("ko-KR");
-        this.setState(date_info);
+        date_info["input_date_text"] = date.toLocaleDateString("ko-KR"); // 안드로이드에서는 적용되지 않음
+        this.setState(date_info); // date_info === {input_date: date, input_date_text: date.toLocaleDateString("ko-KR")}
       }
     } catch ({ code, message }) {
-      console.warn("Cannot open date picker", message);
+      console.warn("Cannot open date picker", message); // 오류 발생시 메세지 출력
     }
   };
   // 아이폰
+  // 아이폰에 내장된 Datepicker를 표시하는 Dialog open
   _showDialog_Datepicker_ios = () => this.setState({ visible_datedialog_ios: true });
+  // 아이폰 Datepicker
   _setDate_ios = newDate =>
     this.setState({
       input_date: newDate,
       input_date_text: newDate.toLocaleDateString("ko-KR"),
     });
+
+  // 안드로이드와 IOS에서 날짜 포멧이 다르게 저장되므로, 포멧을 동일하게 함
+  // 플랫폼 구별하여 리팩토링
+  _distinguish_flatForm = () => {
+    if (Platform.OS === "android") {
+      return this.refactoring_date_android();
+    } else {
+      return this.refactoring_date_ios();
+    }
+  };
   refactoring_date_android = () => {
     let arr = this.state.input_date_text.split("/");
     let res = "";
@@ -90,24 +102,10 @@ export default class ReportTab extends Component {
     console.log(res);
     return res;
   };
-  _distinguish_flatForm = () => {
-    if (Platform.OS === "android") {
-      return this.refactoring_date_android();
-    } else {
-      return this.refactoring_date_ios();
-    }
-  };
-
-  // 신고할 때 회사 이름을 바꿀 때 사용되는 array
-  refactoring_affiliation = value => {
-    const arr = [0, "바로고", "배달요", "리드콜", "모아콜", "부릉", "배민라이더스", "기타"];
-    console.log(arr.indexOf(value));
-    return arr.indexOf(value);
-  };
 
   // 신고
   report = () => {
-    axios
+    axios // 입력된 정보 전송
       .get("http://192.168.2.184:3000/api/report", {
         params: {
           phoneNumber: this.state.input_phoneNumber,
@@ -116,11 +114,17 @@ export default class ReportTab extends Component {
           occuredTime: this._distinguish_flatForm(),
         },
       })
-      .then(() => this.setState({ visible_snackbar_done: true }))
+      .then(() => this.setState({ visible_snackbar_done: true })) // 전송 성공
       .catch(err => {
         console.log(err);
-        this.setState({ visible_snackbar_error: true });
+        this.setState({ visible_snackbar_error: true }); // 전송 실패
       });
+  };
+  // 신고할 때 회사 이름을 바꿀 때 사용
+  refactoring_affiliation = value => {
+    const arr = [0, "바로고", "배달요", "리드콜", "모아콜", "부릉", "배민라이더스", "기타"];
+    console.log(arr.indexOf(value)); // 숫자로만 회사 표현
+    return arr.indexOf(value);
   };
 
   // 창 숨기기
@@ -130,6 +134,7 @@ export default class ReportTab extends Component {
       visible_fooddialog: false,
       visible_datedialog_ios: false,
     });
+
   // '신고' 탭에 표시되는 내용
 
   // 배달원 전화번호
@@ -138,6 +143,7 @@ export default class ReportTab extends Component {
   // 배달원이 음식을 빼먹은 날짜
 
   render() {
+    // 정규표현식을 이용해 휴대폰 입력이 제대로 되었는지 확인
     String.prototype.isValidPhoneNumber = function() {
       return /^010-?([0-9]{8})$/.test(this);
     };
